@@ -92,8 +92,6 @@ the interaction*:
 **Describe your masterwork here, in your own words. What is the core interaction
 someone would recognize it by?**
 
-Also here is the write up for the first part! (Md format to put it in the repo) 
-
 ## What it is
 
 Castel’s ocular harpsichord was designed as a conventional musical keyboard augmented with a visual mechanism. Instead of producing only audible notes, each key was intended to reveal a particular color. Castel associated musical pitch with color according to his own theory of color-sound correspondence, creating what he called “music for the eyes.”
