@@ -144,9 +144,16 @@ and the people around it. If you're new to storyboarding, read
 
 **Include pictures of your storyboards here.**
 
+<img width="1284" height="1998" alt="IMG_9CEBDE24DDE4-1" src="https://github.com/user-attachments/assets/877b71fc-285f-48c4-9625-a156b47f088a" />
+<img width="1284" height="943" alt="IMG_D5AD3AA1EFA4-1" src="https://github.com/user-attachments/assets/923aa5ad-904c-4c55-9293-018e07b52486" />
+
 Use the storyboards to decide what interaction to prototype.
 
 **Summarize the feedback you got here.**
+- On paper, we assumed users would look at the screen while playing. In reality, people spent most of their time looking down at their fingers to find the keys and missed subtle, fast color shifts on the vertical screen. We realized the light needs to spill downwards onto the performer's hands so they can catch color changes in their peripheral vision without having to look up.
+- Given open-ended instructions and no access to Maker Lab, we relied on the natural springiness of folded paper to simulate mechanical key travel and bounce-back, and we are still exploring the possible interactions of the light inside the dark cardboard chamber to connect.
+- A few questions we’ve been struggling with: How does a user understand that a mechanical press controls both light and tone? How do we establish a clear, legible rule system rather than random color flashes? How does the presence of light respond to key velocity, hold duration, and chord combinations?
+
 
 ## Part B. Act out the Interaction
 
@@ -207,6 +214,7 @@ the top of this lab: a viewer who knows the piece should recognize it; a viewer
 who doesn't should come away understanding what it's famous for. How might you illustrate the non-sequential aspects of the interaction in the sketch?
 
 **Include your video here.**
+
 
 **Please indicate who you collaborated with on this lab.** Be generous in
 acknowledging their contributions, and credit any other influences (YouTube,
