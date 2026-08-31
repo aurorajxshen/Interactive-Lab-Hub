@@ -1,3 +1,5 @@
+
+
 # Recreating the Masters of Interactive Light
 
 _This project is to be done in teams of 2._
@@ -192,6 +194,8 @@ building any real electronics. (Zoom works well for recording; you can pin the
 video feed of whichever scene you want to capture.)
 
 **Include your first attempts at recording the wizarded set-up here.**
+https://github.com/user-attachments/assets/999f85de-b629-45f5-a992-cb30bd2c3ed2
+
 
 ## Part E. (optional) Costume the Device
 
