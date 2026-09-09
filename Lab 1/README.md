@@ -261,6 +261,50 @@ your response engages with what your master was really doing.
 **Document everything here — especially the storyboard and video. Photos of the
 prototype are great too.**
 
+### Feedback we received on our Ocular Harpsichord
+
+**Demi Hu** — The masterwork reads as a *proposed* machine (sources disagree on whether a working instrument was ever finished), so the physical form is genuinely open. Wanted to know the mapping rule: is every key⇄colour pair fixed (all C's red, all D's orange…), or does colour depend on volume, speed, or timing? Where does the "box" live — is it occupying the same space as the keyboard, or is it a separate art piece? After the video she still couldn't tell how each keypress produced its colour (she noticed we were using a random palette generator, which is a technical limitation, not an interaction choice). She appreciated how thorough the storyboards were and liked the narrative of a deaf person enjoying a melody through visuals.
+
+**Chih-Hsin Liu** — Loved the beat where the device is placed back on the doll's heart and lights up instantly — it helped him "catch" the masterpiece. But he felt the light responding to a *doll* is less compelling than the light responding to a *person*, and that the piece needs more human interaction overall.
+
+**Monica Wei** — Found it easy to read ("playing the piano changes the colour of the light") and thought the accuracy was high. Suggested dressing the laptop up to look like a piano, and making the light's colour layout correspond to the physical keyboard layout.
+
+### What the feedback has in common
+
+All three are asking for the same missing thing: **a legible rule.** Castel's whole proposal was a *fixed correspondence* between pitch and colour, so that music becomes something you can see (and, as Demi noticed, something a deaf audience could follow). Our Part 1 prototype showed the *idea* of sound-made-visible but hid the *system*, because the colours were random. Chih-Hsin and Monica are also pushing on the same axis from the other side: make the response clearly caused by a *human performer*, and make the spatial layout of the colour match the instrument.
+
+## The move: **Fix its weaknesses** (with a touch of remix)
+
+We chose to address the weakness every reviewer named — *the mapping was arbitrary* — by rebuilding the recreation around **Castel's actual colour scale**, and by making the dynamics of playing (not just which key) drive the light. This is what our master was *really* doing: proposing that pitch and colour are the same underlying order, perceivable together.
+
+Concretely, our ReMaster replaces the random palette with a deterministic instrument:
+
+| Input (what the performer does) | Output (what the light does) |
+|---|---|
+| **Which key** (pitch) | **Hue**, from Castel's 1725 colour scale — C = blue, D = green, E = yellow, F = fawn, G = red, A = violet, B = indigo, with the semitones between. Fixed, every octave. |
+| **How hard / how fast you re-strike** (velocity) | **Brightness** of the wash |
+| **How long you hold** (duration) | Light **sustains** while held, then **fades** slowly on release |
+| **Multiple keys together** (a chord) | Colours **blend additively** into one combined light — a visible chord |
+| Playing at all | Light **spills downward onto the performer's hands** (our Part 1 finding) and an on-screen key lights in its own colour, laid out left-to-right like the keyboard |
+| Pressing **L** | A **legend** overlays the full pitch→colour rule, making the system teachable on camera |
+
+**The remix element:** the light is no longer only a vertical screen the performer ignores. It now has two surfaces — the ambient wash *behind* the instrument (for the audience) and the spill *onto the hands* (for the performer, in peripheral vision). This directly acts on our Part 1 discovery that players look down at their fingers.
+
+**Answering Chih-Hsin:** in the new recreation the light responds to the *performer's* touch and dynamics, not to an object being docked. The "aha" beat becomes: a hearing player and a Deaf friend at the same keyboard, the Deaf friend plays a phrase and *sees* the melody's shape in colour, and the hearing player closes their eyes and follows the same phrase by ear. Same order, two senses.
+
+**Answering Monica:** the on-screen keys sit in keyboard order and each lights its own Castel colour, so the colour "layout" is the instrument layout. (Physical build: paper keys taped over the laptop keys, see prototype photos.)
+
+## Video
+
+See `Lab 1/part2-video.mp4` 
+https://github.com/user-attachments/assets/87ac6daf-c67a-4170-a956-0dac502bf802 
+
+### How this engages with what the master was really doing
+
+Castel wasn't building a light show; he was making a claim that pitch and colour share one structure and can be perceived at once. Our Part 1 recreation demonstrated the *sensation* but not the *claim*. By making the mapping fixed, rule-based, and visible, and by letting the performer's dynamics shape the light, the ReMaster lets an audience actually *test* Castel's idea: play the same phrase twice and the colours are the same both times. That falsifiability is the thing that makes it an instrument rather than a mood lamp.
+
+
+
 ---
 
 
