@@ -1,5 +1,5 @@
 # Interactive Prototyping: The Clock of Pi
-**NAMES OF COLLABORATORS HERE**
+**Tzuyi (Monica) Wei (tw628), Aurora Jiaxin Shen(js3996)**
 
 Does it feel like time is moving strangely during this semester?
 
@@ -158,6 +158,14 @@ You can look in `image.py` for an example of how to display an image on the scre
 
 \*\*\***Include a picture of your own Raspberry Pi displaying the piscreen.service with your unique MAC address. Additionally, please provide another picture showing the successful completion of the screen test.**\*\*\*
 
+**`piscreen.service` running on my Pi (hostname `strawberrypi`), showing my unique MAC address `88:a2:9e:c8:40:87`:**
+
+<img src="piscreen_mac.jpg" alt="piscreen.service showing IP, network and MAC address" height="400" />
+
+**`screen_test.py` completed successfully — the display is filled with the color I typed (`red`) while holding button B:**
+
+<img src="screen_test.jpg" alt="screen_test.py filling the MiniPiTFT with red" height="400" />
+
 
 ## Part D. 
 ### Set up the Display Clock Demo
@@ -193,6 +201,32 @@ We strongly discourage literal digital or analog clock display: Be creative.
 
 
 ** Insert ideas, sketches, [Verplank diagrams](https://ccrma.stanford.edu/courses/250a-fall-2004/IDSketchbok.pdf)), storyboards for your ideas **
+
+### Idea: a clock that counts down what is still in your body
+
+Instead of telling you what time it is, this clock tells you how much alcohol or
+caffeine is still in your system — time measured in cups rather than in hours.
+You log a drink with a button press, the screen fills with a full cup, and the
+liquid level falls as your body metabolises it. An empty cup means you are clear
+to drive.
+
+#### Storyboard
+
+<img src="storyboard.jpg" alt="Storyboard: a user loses track of time while drinking, drives too early, and is given a device that counts down alcohol metabolism" width="700" />
+
+#### Verplank diagram
+
+<img src="verplank_diagram.jpg" alt="Verplank diagram for the metabolism clock: idea, metaphor, model, display, error, scenario, task and control" width="700" />
+
+| | |
+|---|---|
+| **Idea** | A clock to know how much alcohol / caffeine remains in the body. |
+| **Metaphor** | A cup that slowly empties itself. |
+| **Model** | Press a button to log a drink; the display animates the cup draining. |
+| **Display** | Cup with a falling liquid level — red background for alcohol, green for caffeine. |
+| **Error** | "When *can* I drive?" — the moment of uncertainty the device removes. |
+| **Task** | Button 1 and button 2 set the size of the cup, then the countdown runs: full cup → half cup → empty. |
+| **Control** | One press = one cup. The liquid decreases on its own; nothing in the cup means nothing in your body. |
 
 
 
