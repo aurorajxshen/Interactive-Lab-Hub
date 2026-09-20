@@ -231,17 +231,6 @@ to drive.
 
 
 **feedback:**
-Jianing Li: 
-I think it's a really practical and interesting idea. You really drew a very clear Verplank diagram to show lots of specific and feasible information about you idea. I'm curious about how the clock measures the alcohol in your blood to ensure it's time limit warning precise? Or what is the mechanism behind your alcohol count down? Is it a fixed amount of time personalized according to your body data?
-
-Johnathon: 
-The idea is cool, I’d imagine the device as a wearable on my wrist so I can tap on it and see the visual feedback, sense vibrations directly. One question is the type of alcohol , is there any way to differentiate the type of drinks since different alcohol have different time of metabolism
-
-Chih-Hsin Liu:
-I really like this idea. Reframing time as “how much is still in my body” instead of “what hour is it”. It’s also actually useful.
-The only concern I’d add is how you handle logging several drinks in a row. Will there be multiple cups shown on the screen, and will the countdown be extended?
-
-
 
 
 # Lab 2 Part 2
@@ -252,6 +241,22 @@ The only concern I’d add is how you handle logging several drinks in a row. Wi
 
 2. Look at and give feedback on the Part E. for at least 3 other people in the class and get 3 people to comment on your Part E!)
 **Put the feedback for your ideas here.**
+
+Jianing Li: 
+I think it's a really practical and interesting idea. You really drew a very clear Verplank diagram to show lots of specific and feasible information about you idea. I'm curious about how the clock measures the alcohol in your blood to ensure it's time limit warning precise? Or what is the mechanism behind your alcohol count down? Is it a fixed amount of time personalized according to your body data?
+https://github.com/jianingli189/Interactive-Lab-Hub/blob/Fall2026/Lab%202/README.md
+
+Johnathon: 
+The idea is cool, I’d imagine the device as a wearable on my wrist so I can tap on it and see the visual feedback, sense vibrations directly. One question is the type of alcohol , is there any way to differentiate the type of drinks since different alcohol have different time of metabolism
+
+Chih-Hsin Liu:
+I really like this idea. Reframing time as “how much is still in my body” instead of “what hour is it”. It’s also actually useful.
+The only concern I’d add is how you handle logging several drinks in a row. Will there be multiple cups shown on the screen, and will the countdown be extended?
+https://github.com/ctyaaaaao/Interactive-Lab-Hub/blob/Fall2026/Lab%202/README.md
+
+Gabriela Yaulli: 
+I really like the concept! The cup-draining visual is way more intuitive than a number. One thing worth looking into: alcohol and caffeine metabolize really differently, so combining them might make the estimate feel inaccurate. Could be interesting creating two different tools targeting each one of them.
+https://github.com/cgyh98/Interactive-Lab-Hub/tree/Fall2026/Lab%202
 
 ## Update your Lab Hub
 
@@ -283,6 +288,7 @@ Do take advantage of having done the previous iteration to refine and simplify y
 
 ** Insert any updates ideas, sketches, [Verplank diagrams](https://ccrma.stanford.edu/courses/250a-fall-2004/IDSketchbok.pdf))!, storyboards for your ideas **
 
+<img width="2908" height="1988" alt="storyboard2" src="https://github.com/user-attachments/assets/c49970de-d689-4ef2-95ab-75193c932994" />
 
 \*\*\***Put a copy of your code in your Lab 2 Github repo.**\*\*\*
 
