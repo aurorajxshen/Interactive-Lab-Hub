@@ -231,6 +231,7 @@ to drive.
 
 
 **feedback:**
+
 Jianing Li: 
 I think it's a really practical and interesting idea. You really drew a very clear Verplank diagram to show lots of specific and feasible information about you idea. I'm curious about how the clock measures the alcohol in your blood to ensure it's time limit warning precise? Or what is the mechanism behind your alcohol count down? Is it a fixed amount of time personalized according to your body data?
 
@@ -241,7 +242,8 @@ Chih-Hsin Liu:
 I really like this idea. Reframing time as “how much is still in my body” instead of “what hour is it”. It’s also actually useful.
 The only concern I’d add is how you handle logging several drinks in a row. Will there be multiple cups shown on the screen, and will the countdown be extended?
 
-
+Gabriela Yaulli:
+I really like the concept! The cup-draining visual is way more intuitive than a number. One thing worth looking into: alcohol and caffeine metabolize really differently, so combining them might make the estimate feel inaccurate. Could be interesting creating two different tools targeting each one of them
 
 
 # Lab 2 Part 2
@@ -756,9 +758,12 @@ if __name__ == "__main__":
 
 \*\*\***Take a video of your PiClock.**\*\*\*
 
+https://github.com/user-attachments/assets/7a9711ce-4b6a-4767-af17-b68c32922d81
+
+https://github.com/user-attachments/assets/9704df22-6e3b-4094-a1f6-6628be263742
+
 [**final_video.MOV**](final_video.MOV) shows logging drinks, the cup draining, and
 the DON'T DRIVE warning when the door handle is touched too early.
-
 
 This lab was done together by Tzuyi (Monica) Wei (tw628) and Aurora Jiaxin Shen (js3996).
 
