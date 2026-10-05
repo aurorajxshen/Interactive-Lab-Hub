@@ -18,7 +18,7 @@ For my personalized greeting, I chose **Piper** because its neural voice sounded
 
 My Pi greets me with:
 
-> "Hello Jianing! Welcome back. It's nice to see you again."
+> "Hello Aurora! Welcome back. It's nice to see you again."
 
 
 ### Reflection on Different Voices
