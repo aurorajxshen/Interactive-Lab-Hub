@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion';
-import { Burner, HeatLines, Pan, Pancake, Plate, Steam, Annotation } from '../objects';
+import { Burner, HeatLines, Pan, Pancake, Plate, Steam, Annotation, RestSpot, Spatula } from '../objects';
 import { CheckMark, Flourish, SceneFrame, palette } from '../sketch';
-import { isDone, type SceneProps } from './types';
+import { isDone, restLabelOf, type SceneProps } from './types';
 
-/** Second side, heat off, then the pancake glides onto a plate with a small flourish. */
-export function PlateScene({ microIndex, microStates, elapsedSec, finale, reduced }: SceneProps) {
+/** Second side, heat off + spatula rested, then the pancake glides onto a plate with a small flourish. */
+export function PlateScene({ step, microIndex, microStates, elapsedSec, finale, reduced }: SceneProps) {
   const [second, heatOff, plated] = microStates;
   const flameOn = !isDone(heatOff);
   const onPlate = isDone(plated) || finale;
@@ -15,7 +15,23 @@ export function PlateScene({ microIndex, microStates, elapsedSec, finale, reduce
       <Burner x={220} y={318} on={flameOn} scale={0.85} />
       <Pan x={210} y={280} scale={0.85} contents={!onPlate ? <Pancake side="bottom" done={doneness} y={4} /> : null} />
       {flameOn && <HeatLines x={210} y={240} count={3} spread={140} active={!reduced} />}
-      {!flameOn && !onPlate && <Annotation x={70} y={140} text="heat off" sub="✓ burner" dir="right" />}
+      {!flameOn && !onPlate && <Annotation x={150} y={140} text="heat off" dir="right" />}
+      {microIndex >= 1 && (
+        <g>
+          <RestSpot x={120} y={398} rx={84} ry={12} label={restLabelOf(step)} settled={!flameOn} seed={15} />
+          {!flameOn ? (
+            <g transform="translate(56,392) rotate(90) scale(0.62) scale(0.4,1)">
+              <Spatula />
+            </g>
+          ) : (
+            <g className={reduced ? '' : 'bob'}>
+              <g transform="translate(96,330) rotate(-60) scale(0.62) scale(0.6,1)">
+                <Spatula />
+              </g>
+            </g>
+          )}
+        </g>
+      )}
 
       <Plate x={470} y={300} scale={0.8}>
         {onPlate && (

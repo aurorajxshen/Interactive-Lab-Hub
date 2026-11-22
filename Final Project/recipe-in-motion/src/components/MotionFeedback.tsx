@@ -67,7 +67,7 @@ export function MotionFeedback({ micro, progress, now, liveActive, liveIntensity
           </span>
         </div>
       );
-      caption = cls ? 'Twisting is shown as feedback. Each counted twist is yours — press + after a full turn.' : `Press + after each ${micro.unit}.`;
+      caption = cls ? 'Twisting is shown as feedback only — each counted twist is yours.' : `You count each ${micro.unit}; the dots just keep track.`;
       break;
     }
     case 'activeDuration': {
@@ -125,8 +125,24 @@ export function MotionFeedback({ micro, progress, now, liveActive, liveIntensity
       caption = cls === 'CHOPPING' ? 'Motion shows you are chopping — not how much is chopped. You decide when it is enough.' : cls === 'FLIPPING' ? 'A flip motion can be recognised, but you confirm it actually flipped.' : 'Motion is feedback. You confirm when it is done.';
       break;
     }
-    case 'check':
-      caption = 'Confirm when it is done.';
+    case 'check': {
+      if (cls) {
+        // e.g. salt/pepper twisting: movement is shown, never counted or used as a quantity
+        const sec = motionElapsedMs(progress.motion, now) / 1000;
+        metric = (
+          <div className="metric">
+            <span className="metric-value">
+              {Math.floor(sec)}
+              <span className="metric-unit"> s of {classifierLabels[cls].toLowerCase()} seen</span>
+            </span>
+          </div>
+        );
+        caption = 'Movement is feedback only — it does not count twists or measure seasoning. You confirm when it is in.';
+      } else caption = 'Nothing to track here — just your confirmation.';
+      break;
+    }
+    case 'toolReturn':
+      caption = 'Safety check-in. Sensors and the screen cannot see where a tool is resting — only you can.';
       break;
   }
 
@@ -138,7 +154,7 @@ export function MotionFeedback({ micro, progress, now, liveActive, liveIntensity
             <span className={`live-dot ${active ? 'is-on' : ''}`} aria-hidden />
             <div>
               <div className="feedback-label">
-                {paused ? 'Paused' : active ? `${classifierLabels[cls!]} · motion preview` : `${classifierLabels[cls!]} — no motion yet`}
+                {paused ? 'Paused' : active ? `${classifierLabels[cls!]} · movement seen` : `${classifierLabels[cls!]} — no motion yet`}
               </div>
               <Squiggle active={active} intensity={liveIntensity} />
             </div>
@@ -146,11 +162,11 @@ export function MotionFeedback({ micro, progress, now, liveActive, liveIntensity
         ) : (
           <>
             <span className="live-dot is-idle" aria-hidden />
-            <div className="feedback-label">{micro.kind === 'timer' ? 'Timer — watch the pan' : 'No movement needed'}</div>
+            <div className="feedback-label">{micro.kind === 'timer' ? 'Timer — watch the pan' : micro.kind === 'toolReturn' ? 'Tool check-in' : 'No movement needed'}</div>
           </>
         )}
       </div>
-      {metric && <div className="feedback-metric">{metric}</div>}
+      <div className="feedback-metric">{metric}</div>
       <p className="feedback-caption">{caption}</p>
     </section>
   );

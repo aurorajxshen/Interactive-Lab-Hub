@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { keyboardMap, type KeyAction } from './config/interactionConfig';
 import { SketchDefs } from './illustrations/sketch';
@@ -9,6 +9,8 @@ import { PrepScreen } from './screens/PrepScreen';
 import { CookingScreen } from './screens/CookingScreen';
 import { MemoryScreen } from './screens/MemoryScreen';
 import { HelpOverlay } from './components/HelpOverlay';
+import { useVoiceGuidance } from './voice/useVoiceGuidance';
+import { useSensorBridge } from './sensors/useSensorBridge';
 
 function keyAction(key: string): KeyAction | null {
   const k = key.length === 1 ? key.toLowerCase() : key;
@@ -24,6 +26,14 @@ export default function App() {
   const [reducedOverride, setReducedOverride] = useState<boolean | null>(null);
   const reduced = reducedOverride ?? systemReduced;
   const [help, setHelp] = useState(false);
+  const voice = useVoiceGuidance();
+  const sensors = useSensorBridge(state, act, confirm);
+  const voiceToggleRef = useRef<(() => void) | null>(null);
+
+  // leaving the cooking screen silences any guidance
+  useEffect(() => {
+    if (state.phase !== 'cooking') voice.stop();
+  }, [state.phase, voice.stop]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -52,6 +62,8 @@ export default function App() {
           return act({ type: 'TOGGLE_PAUSE', now: t });
         case 'motion':
           return session.toggleMotion();
+        case 'voice':
+          return voiceToggleRef.current?.();
       }
     };
     // After a mouse click, drop focus so a later Enter means "confirm", not "press that button again"
@@ -71,9 +83,9 @@ export default function App() {
       <SketchDefs />
       {state.phase === 'welcome' && <WelcomeScreen onStart={() => act({ type: 'GO_PREP' })} />}
       {state.phase === 'prep' && <PrepScreen onBack={() => act({ type: 'GO_WELCOME' })} onStart={() => act({ type: 'START_COOKING', now: Date.now() })} />}
-      {state.phase === 'cooking' && <CookingScreen session={session} now={now} reduced={reduced} onToggleReduced={() => setReducedOverride(!reduced)} onHelp={() => setHelp(true)} />}
+      {state.phase === 'cooking' && <CookingScreen session={session} now={now} reduced={reduced} onToggleReduced={() => setReducedOverride(!reduced)} onHelp={() => setHelp(true)} voice={voice} voiceToggleRef={voiceToggleRef} sensors={sensors.status} />}
       {state.phase === 'memory' && session.memory && <MemoryScreen memory={session.memory} onUpdate={session.updateMemory} onRestart={session.restart} />}
-      <AnimatePresence>{help && <HelpOverlay onClose={() => setHelp(false)} />}</AnimatePresence>
+      <AnimatePresence>{help && <HelpOverlay onClose={() => setHelp(false)} voice={voice} sensors={sensors} />}</AnimatePresence>
     </div>
   );
 }

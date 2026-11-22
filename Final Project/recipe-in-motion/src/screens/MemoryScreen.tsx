@@ -36,9 +36,17 @@ export function MemoryScreen({ memory, onUpdate, onRestart }: { memory: MemoryRe
             <dt>Whisking</dt>
             <dd>{formatDuration(memory.whisk.activeMs)} active</dd>
           </div>
+          {memory.toolChecks && (
+            <div>
+              <dt>Tools returned</dt>
+              <dd>
+                {memory.toolChecks.confirmed} of {memory.toolChecks.total}
+              </dd>
+            </div>
+          )}
         </dl>
         <p className="legend">
-          <span className="legend-recorded">recorded</span> times come from this session’s confirmations and timers. Motion came from the preview button, not a sensor.
+          <span className="legend-recorded">recorded</span> times come from this session’s confirmations and timers. Tool check-ins are your own confirmations{memory.toolChecks?.skipped.length ? ` (skipped: ${memory.toolChecks.skipped.join(', ')})` : ''}. Motion came from the preview button or the wearable sensors and was feedback only — it never measured quantity or doneness.
         </p>
       </motion.section>
 

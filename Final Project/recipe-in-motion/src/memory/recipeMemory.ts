@@ -26,6 +26,8 @@ export interface MemoryRecord {
   pausedMs: number;
   steps: StepMemory[];
   whisk: { activeMs: number; segments: number; samples: number[]; checks: string[] };
+  /** Tool-return checkpoints: confirmed by the cook (never sensor-verified) */
+  toolChecks?: { confirmed: number; total: number; skipped: string[] };
   note: string;
   photo: string | null;
   log: TimelineEntry[];
@@ -73,6 +75,7 @@ export function buildMemory(s: RecipeState): MemoryRecord {
     step.micro.forEach((m, i) => {
       const p = ps[i];
       if (p.status === 'skipped') details.push(`${m.label}: skipped`);
+      else if (m.kind === 'toolReturn') details.push(`${m.confirmLabel} ✓`);
       else if (m.kind === 'counter') details.push(`${m.label}: ${p.count}/${m.target} ${m.unitPlural}`);
       else if (m.kind === 'activeDuration') details.push(`${m.label}: ${Math.round(motionElapsedMs(p.motion, finishedAt) / 1000)} s active`);
       else if (m.kind === 'timer') details.push(`${m.label}: ${Math.round(timerElapsedMs(p.timer, finishedAt) / 1000)} s`);
@@ -90,6 +93,12 @@ export function buildMemory(s: RecipeState): MemoryRecord {
     };
   });
   const whiskP = s.micro['whisk-batter'];
+  const toolMicros = recipeConfig.steps.flatMap((st) => st.micro).filter((m) => m.kind === 'toolReturn');
+  const toolChecks = {
+    confirmed: toolMicros.filter((m) => s.micro[m.id].status === 'done').length,
+    total: toolMicros.length,
+    skipped: toolMicros.filter((m) => s.micro[m.id].status === 'skipped').map((m) => m.label),
+  };
   return {
     id: `${startedAt}`,
     number: nextMemoryNumber(),
@@ -105,6 +114,7 @@ export function buildMemory(s: RecipeState): MemoryRecord {
       samples: whiskP.motion.samples,
       checks: whiskP.outcomes,
     },
+    toolChecks,
     note: '',
     photo: null,
     log: s.log,

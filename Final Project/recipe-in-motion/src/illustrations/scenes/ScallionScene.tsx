@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { BatterPool, Bowl, ScallionRing } from '../objects';
+import { BatterPool, Bowl, RestSpot, ScallionRing, Whisk } from '../objects';
 import { CheckMark, Crayon, Ink, SceneFrame, palette, rng, useMotionPhase, wobblyEllipse } from '../sketch';
-import { isDone, type SceneProps } from './types';
+import { isDone, restLabelOf, type SceneProps } from './types';
 
-/** Green rings drop in, then circulate with stirring motion. */
-export function ScallionScene({ microIndex, microStates, live, stepDone, reduced }: SceneProps) {
+/** Green rings drop in, circulate with the same whisk, then the whisk is set down on its rest. */
+export function ScallionScene({ step, microIndex, microStates, live, stepDone, reduced }: SceneProps) {
   const { phase, energy } = useMotionPhase(live.active, live.intensity, { speed: 6, reduced });
   const added = isDone(microStates[0]);
   const rings = useMemo(() => {
@@ -33,8 +33,8 @@ export function ScallionScene({ microIndex, microStates, live, stepDone, reduced
     <SceneFrame label="Chopped scallion rings stirred into batter">
       <Bowl x={320} y={240} rx={170} depth={128} contents={contents} />
       {microIndex === 0 && !added && (
-        <g>
-          <g className={reduced ? '' : 'bob'} transform="translate(130,140)">
+        <g className={reduced ? '' : 'bob'}>
+          <g transform="translate(130,140)">
             <Crayon d={wobblyEllipse(0, 0, 70, 18, 3, 0.03, 0)} color={palette.cream} />
             <Ink d={wobblyEllipse(0, 0, 70, 18, 3, 0.03, 0.06)} />
             {rings.slice(0, 10).map((rg, i) => (
@@ -43,10 +43,26 @@ export function ScallionScene({ microIndex, microStates, live, stepDone, reduced
           </g>
         </g>
       )}
-      {microIndex === 1 && (
-        <g transform={`translate(${320 + Math.cos(phase) * 60 * energy},${236 + Math.sin(phase) * 14 * energy}) rotate(${20 + Math.cos(phase) * 6 * energy})`}>
-          <Ink d="M0,0 C2,-50 4,-110 6,-160" width={5} color={palette.terracotta} />
-          <Ink d="M0,0 C2,-50 4,-110 6,-160" width={1.4} />
+      {(microIndex === 0 || microIndex === 1) && !stepDone && (
+        // the same whisk keeps working — no tool change between whisking and folding
+        <g transform={`translate(${(microIndex === 0 ? 470 : 320) + Math.cos(phase) * 60 * energy},${(microIndex === 0 ? 220 : 236) + Math.sin(phase) * 14 * energy}) rotate(${(microIndex === 0 ? 28 : 20) + Math.cos(phase) * 6 * energy}) scale(0.82)`}>
+          <Whisk />
+        </g>
+      )}
+      {microIndex === 2 && (
+        <g>
+          <RestSpot x={540} y={394} rx={86} ry={14} label={restLabelOf(step)} settled={isDone(microStates[2])} seed={11} />
+          {isDone(microStates[2]) ? (
+            <g transform="translate(462,392) rotate(86) scale(0.7)">
+              <Whisk />
+            </g>
+          ) : (
+            <g className={reduced ? '' : 'bob'}>
+              <g transform="translate(560,300) rotate(32) scale(0.72)">
+                <Whisk />
+              </g>
+            </g>
+          )}
         </g>
       )}
       {stepDone && <CheckMark x={560} y={120} size={1.4} />}

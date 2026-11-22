@@ -1,14 +1,16 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bowl, Egg, EggYolk, FlourBag, FlourMound, MeasuringJug, Spoon } from '../objects';
+import { Bowl, Egg, EggYolk, FlourBag, FlourMound, MeasuringJug, RestSpot, Spoon } from '../objects';
 import { CheckMark, SceneFrame, palette, wobblyEllipse } from '../sketch';
-import { isDone, type SceneProps } from './types';
+import { isDone, restLabelOf, type SceneProps } from './types';
 
-/** Three sequential micro-scenes in one bowl: egg → water → flour × 3 */
-export function BatterScene({ microIndex, microStates, stepDone, reduced }: SceneProps) {
-  const [egg, water, flour] = microStates;
+/** Sequential micro-scenes in one bowl: egg → water → flour × 3 → spoon back on its rest */
+export function BatterScene({ step, microIndex, microStates, stepDone, reduced }: SceneProps) {
+  const [egg, water, flour, spoonBack] = microStates;
+  const spoonHome = isDone(spoonBack);
   const eggIn = isDone(egg);
   const waterIn = isDone(water);
-  const scoops = flour?.count ?? 0;
+  // flour is confirmed once for all three scoops (no per-scoop counting)
+  const scoops = isDone(flour) ? 3 : 0;
   const ease = { duration: reduced ? 0 : 0.8, ease: [0.3, 0.7, 0.4, 1] as const };
 
   const contents = (
@@ -56,21 +58,26 @@ export function BatterScene({ microIndex, microStates, stepDone, reduced }: Scen
       )}
 
       {/* micro 2: spoon + bag, with a counter drawn as three little circles */}
+      {microIndex === 3 && (
+        <g>
+          <FlourBag x={110} y={250} />
+          <RestSpot x={520} y={382} rx={92} ry={16} label={restLabelOf(step)} settled={spoonHome} seed={5} />
+          {spoonHome ? (
+            <Spoon x={480} y={378} rotate={-4} heaped={false} />
+          ) : (
+            <g className={reduced ? '' : 'bob'}>
+              <Spoon x={470} y={330} rotate={-12} heaped={false} />
+            </g>
+          )}
+        </g>
+      )}
+
       {microIndex === 2 && !stepDone && (
         <g>
           <FlourBag x={110} y={250} />
           <g className={reduced ? '' : 'bob'}>
             <Spoon x={220} y={150} rotate={-14} />
           </g>
-          {[0, 1, 2].map((i) => (
-            <g key={i} transform={`translate(${470 + i * 38},120)`}>
-              <circle r={14} fill={i < scoops ? palette.egg : 'none'} opacity={0.75} filter="url(#rim-crayon)" />
-              <circle r={14} fill="none" stroke={palette.ink} strokeWidth={1.6} filter="url(#rim-rough)" />
-              <text y={5} textAnchor="middle" className="svg-hand" fontSize={16} fill={palette.ink}>
-                {i + 1}
-              </text>
-            </g>
-          ))}
         </g>
       )}
       {stepDone && <CheckMark x={540} y={120} size={1.4} />}

@@ -290,11 +290,25 @@ button:disabled {
   margin-top: 40px;
 }
 
-/* ───────── Cooking layout ───────── */
+/* ───────── Cooking layout ─────────
+   Stable named regions. Desktop: the screen is exactly one viewport tall and
+   every region is sized by the grid, never by its content.
+
+     header   ─────────────────────────────
+     status   (reserved: banners + notices)
+     heading │ art
+     guide   │ art
+     guide   │ feedback
+     controls ─────────────────────────────            */
 .cooking {
-  min-height: 100vh;
+  --accent: var(--terracotta);
+  --status-h: 46px;
+  --feedback-h: 108px;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 600px;
   display: grid;
-  grid-template-rows: auto auto auto 1fr auto;
+  grid-template-rows: auto var(--status-h) minmax(0, 1fr) auto;
 }
 
 .topbar {
@@ -302,7 +316,7 @@ button:disabled {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding: 18px 32px 10px;
+  padding: 16px 40px 6px;
 }
 
 .brand {
@@ -389,66 +403,122 @@ button:disabled {
   font-weight: 500;
 }
 
+/* status row: reserved height, nothing below it moves when a notice appears */
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 0 40px;
+  min-width: 0;
+}
+
 .banner {
   display: flex;
-  justify-content: center;
   align-items: baseline;
   gap: 18px;
-  margin: 4px auto 0;
-  padding: 8px 18px;
+  padding: 7px 18px;
   font-size: 14px;
   border: 1px dashed var(--ink-faint);
   border-radius: var(--radius);
-  width: fit-content;
+  min-width: 0;
 }
 
 .banner.is-paused {
   border-color: var(--blue);
 }
 
+.notice {
+  max-width: min(460px, 100%);
+  padding: 8px 16px;
+  border-radius: 6px 16px 8px 14px;
+  line-height: 1.35;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 14px;
+  text-align: center;
+}
+
+.notice.is-warn {
+  background: #b0624f;
+}
+
+.notice.is-success {
+  background: #637a4c;
+}
+
 .stage {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 8px 32px 4px;
+  display: grid;
+  grid-template-columns: minmax(330px, 0.82fr) minmax(0, 1.38fr);
+  grid-template-rows: auto minmax(0, 1fr) var(--feedback-h);
+  grid-template-areas:
+    'heading art'
+    'guide   art'
+    'guide   feedback';
+  gap: 16px 56px;
+  width: 100%;
+  max-width: 1560px;
+  margin: 0 auto;
+  padding: 4px 40px 10px;
   min-height: 0;
 }
 
-.step-text {
+.region-heading {
+  grid-area: heading;
   display: flex;
   align-items: flex-start;
-  gap: 22px;
-  width: min(1080px, 100%);
+  gap: 18px;
+  /* room for a two-line title + the micro trail, so the guide panel never jumps */
+  min-height: 9.6rem;
+  min-width: 0;
+}
+
+.region-art {
+  grid-area: art;
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+}
+
+.region-guide {
+  grid-area: guide;
+  min-height: 0;
+  min-width: 0;
+}
+
+.region-feedback {
+  grid-area: feedback;
+  min-height: 0;
+  min-width: 0;
 }
 
 .step-number {
   font-family: var(--serif);
   font-weight: 300;
-  font-size: 84px;
+  font-size: 72px;
   line-height: 0.86;
   color: transparent;
-  -webkit-text-stroke: 1.2px var(--terracotta);
+  -webkit-text-stroke: 1.2px var(--accent);
+  flex-shrink: 0;
+}
+
+.heading-text {
+  min-width: 0;
 }
 
 .step-title {
   font-family: var(--serif);
   font-weight: 400;
-  font-size: clamp(36px, 3.6vw, 54px);
+  font-size: clamp(34px, 3.2vw, 52px);
   line-height: 1.02;
   letter-spacing: -0.015em;
   margin: 0;
 }
 
-.step-instruction {
-  font-size: clamp(18px, 1.45vw, 22px);
-  line-height: 1.45;
-  margin: 10px 0 0;
-  max-width: 58ch;
-}
-
 .micro-trail {
   list-style: none;
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   padding: 0;
   margin: 14px 0 0;
@@ -464,10 +534,10 @@ button:disabled {
 
 .micro-trail li + li::before {
   content: '';
-  width: 22px;
+  width: 16px;
   height: 1px;
   background: var(--ink-faint);
-  margin-right: 4px;
+  margin-right: 2px;
 }
 
 .trail-mark {
@@ -505,33 +575,25 @@ button:disabled {
   font-size: 12px;
 }
 
-/* the illustration is the emotional center */
-.illustration-wrap {
-  position: relative;
-  width: min(980px, 100%);
-  flex: 1;
+/* the illustration is the visual focus: sized by its region, never by copy */
+.illustration {
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  min-height: 300px;
-}
-
-.illustration {
-  width: 100%;
-  display: flex;
   justify-content: center;
 }
 
 .scene-svg {
   width: 100%;
-  max-height: 52vh;
+  height: 100%;
   overflow: visible;
 }
 
-.guidance {
+.measure {
   position: absolute;
   left: 0;
-  top: 12%;
+  top: 2%;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -539,60 +601,153 @@ button:disabled {
   pointer-events: none;
 }
 
-.guidance-qty {
+.measure-qty {
   font-family: var(--serif);
-  font-size: clamp(30px, 3vw, 44px);
+  font-size: clamp(28px, 2.6vw, 42px);
   font-weight: 400;
   line-height: 1;
 }
 
-.guidance-time {
+.measure-time {
   font-family: var(--serif);
   font-style: italic;
-  font-size: clamp(24px, 2.4vw, 34px);
+  font-size: clamp(22px, 2.1vw, 32px);
   color: var(--terracotta);
 }
 
-.guidance-note {
-  font-family: var(--hand);
-  font-size: 22px;
+/* ───────── Guidance panel (instruction · safety · cues · tip · note · voice) ───────── */
+.guidance-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding-top: 12px;
+  border-top: 1.5px solid var(--ink);
+}
+
+.gp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 34px;
+}
+
+.gp-kicker {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   color: var(--ink-soft);
 }
 
-.cues {
-  position: absolute;
-  right: 0;
-  bottom: 6%;
-  max-width: 240px;
+.voice-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px 6px 10px;
+  border: 1px solid var(--ink-faint);
+  border-radius: var(--radius);
+  background: none;
+  font-size: 13px;
+  flex-shrink: 0;
+  transition: border-color 200ms, color 200ms;
+}
+
+.voice-btn:not(:disabled):hover {
+  border-color: var(--ink);
+}
+
+.voice-btn.is-on {
+  border-color: var(--terracotta);
+  color: var(--terracotta);
+}
+
+.gp-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.gp-instruction {
+  font-size: clamp(20px, 1.55vw, 25px);
+  line-height: 1.38;
+  margin: 10px 0 16px;
+  max-width: 36ch;
+}
+
+.guidance-panel.is-muted .gp-instruction {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+.gp-line {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  gap: 10px;
+  margin: 0 0 10px;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.gp-tag {
+  padding-top: 3px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.gp-safety {
+  color: #9a4f3e;
+}
+
+.gp-safety .gp-tag {
+  color: var(--terracotta);
+  font-weight: 600;
+}
+
+.gp-cues ul {
   list-style: none;
-  padding: 0;
   margin: 0;
-  font-size: 14px;
-  line-height: 1.4;
+  padding: 0;
 }
 
-.cues li {
-  padding-left: 18px;
+.gp-cues li {
   position: relative;
-  margin-bottom: 6px;
+  padding-left: 18px;
+  margin-bottom: 4px;
 }
 
-.cues li::before {
+.gp-cues li::before {
   content: '○';
   position: absolute;
   left: 0;
   color: var(--terracotta);
 }
 
+.gp-aside {
+  margin: 12px 0 0;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
 /* ───────── Motion feedback ───────── */
 .feedback {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) minmax(240px, 1.1fr) minmax(220px, 1.2fr);
+  grid-template-columns: minmax(170px, 1fr) minmax(200px, 1.1fr) minmax(200px, 1.3fr);
   align-items: center;
-  gap: 28px;
-  width: min(1080px, 100%);
-  padding: 14px 4px;
+  gap: 24px;
+  height: 100%;
+  padding: 10px 4px 0;
   border-top: 1px solid var(--ink-faint);
+}
+
+.feedback.is-placeholder {
+  grid-template-columns: 1fr;
 }
 
 .feedback-sensor {
@@ -643,7 +798,7 @@ button:disabled {
 
 .metric-value {
   font-family: var(--serif);
-  font-size: 32px;
+  font-size: 30px;
   line-height: 1;
   white-space: nowrap;
 }
@@ -657,7 +812,7 @@ button:disabled {
 .bar {
   position: relative;
   flex: 1;
-  min-width: 80px;
+  min-width: 70px;
   height: 6px;
   border-radius: 4px;
   background: var(--ink-faint);
@@ -709,23 +864,15 @@ button:disabled {
   color: var(--ink-soft);
 }
 
-.safety-note {
-  margin: 4px 0 0;
-  font-size: 13px;
-  color: var(--terracotta);
-}
-
-.finale-cta {
-  margin: 12px 0;
-}
-
-/* ───────── Inspection prompt ───────── */
+/* ───────── Inspection prompt (floats inside the art region only) ───────── */
 .inspection {
   position: absolute;
   right: 0;
-  top: 8%;
-  width: 300px;
-  padding: 22px;
+  top: 0;
+  width: min(300px, 70%);
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 20px 22px;
   background: var(--paper);
   border: 1.5px solid var(--ink);
   border-radius: 4px 14px 6px 12px;
@@ -741,8 +888,8 @@ button:disabled {
 .inspection h3 {
   font-family: var(--serif);
   font-weight: 400;
-  font-size: 22px;
-  margin: 6px 0 14px;
+  font-size: 21px;
+  margin: 6px 0 12px;
   line-height: 1.2;
 }
 
@@ -750,14 +897,14 @@ button:disabled {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .option {
   display: grid;
   grid-template-columns: 1fr;
   text-align: left;
-  padding: 10px 14px;
+  padding: 9px 14px;
   border: 1px solid var(--ink-faint);
   border-radius: 10px;
   background: none;
@@ -781,60 +928,199 @@ button:disabled {
   color: var(--ink-soft);
 }
 
-/* ───────── Controls ───────── */
+/* ───────── Controls: helper label + confirm always in the same place ───────── */
 .controls {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-areas: 'left center right';
+  align-items: end;
   gap: 16px;
-  padding: 12px 32px 22px;
+  padding: 8px 40px 20px;
+  border-top: 1px solid var(--ink-faint);
+  background: var(--paper);
 }
 
 .controls-side {
+  grid-area: left;
   display: flex;
-  gap: 4px;
   flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  min-height: 56px;
 }
 
 .controls-side.is-right {
+  grid-area: right;
   justify-content: flex-end;
 }
 
 .controls-center {
+  grid-area: center;
+  width: 480px;
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  align-items: stretch;
 }
 
-.notice {
-  position: fixed;
-  right: 32px;
-  top: 72px;
-  max-width: min(400px, 90vw);
-  padding: 12px 18px;
-  border-radius: 6px 16px 8px 14px;
-  line-height: 1.4;
-  text-align: left;
-  background: var(--ink);
-  color: var(--paper);
-  font-size: 14px;
+.confirm-helper {
+  /* two lines reserved, text sits right on top of the button */
+  min-height: 2.8em;
+  margin: 0 0 6px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
   text-align: center;
-  z-index: 5;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink-soft);
 }
 
-.notice.is-warn {
-  background: var(--terracotta);
+.confirm-row {
+  display: grid;
+  grid-template-columns: 44px 44px minmax(0, 1fr) 44px 44px;
+  align-items: center;
+  gap: 8px;
 }
 
-.notice.is-success {
-  background: #6e8556;
+.round-slot,
+.complete-slot {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
 }
 
-/* safety contexts: a quiet warm edge */
-.cooking.is-hotPan .stage,
-.cooking.is-knife .stage {
-  background: radial-gradient(ellipse at 50% 60%, rgba(201, 117, 99, 0.06), transparent 65%);
+.confirm-slot {
+  display: flex;
+  justify-content: center;
 }
+
+.confirm-slot .confirm {
+  width: 100%;
+  min-height: 56px;
+  justify-content: center;
+  text-align: center;
+}
+
+.confirm.is-ghost {
+  background: transparent;
+  color: var(--ink-soft);
+  border-color: var(--ink-faint);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ───────── Task-complete mark ───────── */
+.complete-mark {
+  display: block;
+  width: 44px;
+  height: 44px;
+  color: var(--mark-color, var(--green));
+  animation: cm-fade 320ms ease calc(var(--hold-ms, 1900ms) - 340ms) forwards;
+}
+
+.complete-mark svg {
+  display: block;
+  overflow: visible;
+  transform-origin: 50% 50%;
+}
+
+.complete-mark.is-animated .cm-circle {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: cm-draw calc(var(--mark-ms) * 0.55) cubic-bezier(0.5, 0, 0.3, 1) forwards;
+}
+
+.complete-mark.is-animated .cm-tick {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: cm-draw calc(var(--mark-ms) * 0.3) var(--ease) calc(var(--mark-ms) * 0.5) forwards;
+}
+
+.complete-mark.is-animated svg {
+  animation: cm-settle calc(var(--mark-ms) * 0.28) ease-out calc(var(--mark-ms) * 0.72) both;
+}
+
+@keyframes cm-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes cm-settle {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes cm-fade {
+  to {
+    opacity: 0;
+  }
+}
+
+.app.is-reduced .complete-mark,
+.app.is-reduced .complete-mark svg,
+.app.is-reduced .complete-mark path {
+  animation: none !important;
+  stroke-dashoffset: 0 !important;
+}
+
+/* safety contexts: a quiet warm wash behind the illustration */
+.cooking.is-hotPan .region-art,
+.cooking.is-knife .region-art {
+  background: radial-gradient(ellipse at 50% 60%, rgba(201, 117, 99, 0.07), transparent 65%);
+}
+
+.voice-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.voice-settings label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.voice-settings label.check {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.voice-settings select {
+  font: inherit;
+  padding: 6px 8px;
+  border: 1px solid var(--ink-faint);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--ink);
+  max-width: 100%;
+}
+
+.voice-settings .text-btn {
+  align-self: flex-start;
+}
+
 
 /* ───────── Help overlay ───────── */
 .overlay {
@@ -1264,36 +1550,236 @@ button:disabled {
   }
 }
 
-/* ───────── Narrower screens ───────── */
+/* ───────── Narrower screens: an intentional single-column stack ───────── */
 @media (max-width: 960px) {
   .welcome,
   .memory {
     grid-template-columns: 1fr;
   }
-  .feedback {
+  .help-grid {
     grid-template-columns: 1fr;
-    gap: 10px;
+  }
+}
+
+@media (max-width: 900px) {
+  .cooking {
+    --feedback-h: auto;
+    height: auto;
+    min-height: 100dvh;
+    grid-template-rows: auto auto auto auto;
   }
   .topbar {
     flex-wrap: wrap;
+    padding: 14px 20px 4px;
+    gap: 8px 16px;
   }
-  .guidance {
-    position: static;
+  .progress {
+    order: 3;
+    width: 100%;
+    justify-content: space-between;
   }
-  .illustration-wrap {
-    flex-direction: column;
+  .tick-mark {
+    width: 100%;
+    min-width: 22px;
   }
-  .inspection,
-  .cues {
+  .progress-tick {
+    flex: 1;
+    padding: 4px 1px;
+  }
+  .tick-label {
+    display: none;
+  }
+  .status-row {
+    min-height: var(--status-h);
+    flex-wrap: wrap;
+    padding: 6px 20px;
+  }
+  .banner {
+    flex-wrap: wrap;
+    border-radius: 14px;
+  }
+  .stage {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      'heading'
+      'art'
+      'guide'
+      'feedback';
+    gap: 14px;
+    padding: 4px 20px 16px;
+  }
+  .region-heading {
+    min-height: 0;
+  }
+  .step-number {
+    font-size: 52px;
+  }
+  .region-art {
+    width: 100%;
+    aspect-ratio: 640 / 420;
+    max-height: 44vh;
+    margin: 0 auto;
+  }
+  .measure {
+    top: 0;
+  }
+  .measure-qty {
+    font-size: 26px;
+  }
+  .measure-time {
+    font-size: 20px;
+  }
+  .inspection {
     position: static;
     width: 100%;
-    max-width: none;
+    max-height: none;
+    margin-top: 8px;
+  }
+  .region-art:has(.inspection) {
+    aspect-ratio: auto;
+    max-height: none;
+    display: flex;
+    flex-direction: column;
+  }
+  .region-art:has(.inspection) .illustration {
+    position: relative;
+    height: 30vh;
+  }
+  .guidance-panel {
+    height: auto;
+  }
+  .gp-body {
+    overflow: visible;
+  }
+  .region-feedback {
+    min-height: 150px;
+  }
+  .feedback {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    height: auto;
   }
   .controls {
-    grid-template-columns: 1fr;
+    position: sticky;
+    bottom: 0;
+    z-index: 4;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      'center center'
+      'left right';
+    gap: 4px 8px;
+    padding: 6px 12px calc(10px + env(safe-area-inset-bottom));
+    box-shadow: 0 -10px 18px -14px rgba(62, 77, 59, 0.35);
   }
-  .controls-side,
+  .controls-center {
+    width: 100%;
+    max-width: 480px;
+    justify-self: center;
+  }
+  .confirm-helper {
+    min-height: 2.8em;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  .confirm-row {
+    grid-template-columns: 40px 40px minmax(0, 1fr) 40px 40px;
+    gap: 4px;
+  }
+  .controls-side {
+    min-height: 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  .controls-side .ctl {
+    padding: 8px 9px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .controls {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  /* arrow-only Back / Look ahead (labels stay in aria-label) */
+  .controls-side .ctl > span {
+    display: none;
+  }
+  .controls-side .ctl {
+    padding: 8px 7px;
+  }
   .controls-side.is-right {
-    justify-content: center;
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+}
+
+/* ───────── Sensor link chip (fixed width: gesture feedback never shifts the header) ───────── */
+.sensor-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: 196px;
+  padding: 5px 12px;
+  border: 1px solid var(--ink-faint);
+  border-radius: var(--radius);
+  background: none;
+  font-size: 13px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sensor-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sensor-dot {
+  width: 9px;
+  height: 9px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1.4px dashed var(--ink-soft);
+}
+
+.sensor-chip.is-live {
+  color: var(--ink);
+}
+
+.sensor-chip.is-live .sensor-dot {
+  border: none;
+  background: var(--green);
+}
+
+.sensor-chip.is-wait .sensor-dot {
+  border-style: solid;
+  border-color: var(--blue);
+}
+
+.sensor-chip.is-warn {
+  color: #9a4f3e;
+  border-color: rgba(201, 117, 99, 0.5);
+}
+
+.sensor-chip.is-warn .sensor-dot {
+  border: none;
+  background: var(--terracotta);
+}
+
+.help input[type='url'] {
+  font: inherit;
+  padding: 6px 8px;
+  border: 1px solid var(--ink-faint);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+@media (max-width: 900px) {
+  .sensor-chip {
+    width: auto;
+    max-width: 190px;
   }
 }

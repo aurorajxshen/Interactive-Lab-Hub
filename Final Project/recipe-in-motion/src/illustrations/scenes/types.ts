@@ -18,3 +18,9 @@ export interface SceneProps {
 }
 
 export const isDone = (p?: MicroProgress) => p?.status === 'done' || p?.status === 'skipped';
+
+/** Hand-lettered rest label for a step's tool-return checkpoint (from recipeConfig) */
+export function restLabelOf(step: SceneProps['step']): string | undefined {
+  const m = step.micro.find((x) => x.kind === 'toolReturn');
+  return m && m.kind === 'toolReturn' ? m.restLabel : undefined;
+}

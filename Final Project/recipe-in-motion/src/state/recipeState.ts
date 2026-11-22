@@ -10,7 +10,7 @@
  * sensor routes later) only updates motion records; only CONFIRM / INCREMENT /
  * CHOOSE_BRANCH / SKIP (deliberate user actions) move progress forward.
  */
-import { recipeConfig, microAt, type MicroAction, type ClassifierId } from '../config/recipeConfig';
+import { recipeConfig, microAt, doneLabelFor, allMicroActions, type MicroAction, type ClassifierId } from '../config/recipeConfig';
 import { interactionConfig } from '../config/interactionConfig';
 
 export type Phase = 'welcome' | 'prep' | 'cooking' | 'memory';
@@ -47,6 +47,7 @@ export interface MicroProgress {
 export type TimelineType =
   | 'start'
   | 'confirm'
+  | 'tool-return'
   | 'count'
   | 'skip'
   | 'branch'
@@ -83,6 +84,13 @@ interface Snapshot {
   finishedAt: number | null;
 }
 
+/** Stamp of the most recent real transition to `done` (drives the task-complete mark) */
+export interface Completion {
+  microId: string;
+  at: number;
+  label: string;
+}
+
 export interface RecipeState {
   phase: Phase;
   startedAt: number | null;
@@ -99,6 +107,8 @@ export interface RecipeState {
   notice: Notice | null;
   /** Plating celebration is playing */
   finale: boolean;
+  /** Set only when a micro-action becomes `done`; cleared by undo. Not part of undo snapshots. */
+  lastCompleted: Completion | null;
 }
 
 export type RecipeAction =
@@ -162,6 +172,7 @@ export function initialRecipeState(): RecipeState {
     undo: [],
     notice: null,
     finale: false,
+    lastCompleted: null,
   };
 }
 
@@ -229,12 +240,29 @@ function flushMicro(p: MicroProgress, now: number): MicroProgress {
   };
 }
 
+/** A pending timer whose `clockFrom` action is already confirmed keeps running in the background */
+function isPreStarted(s: RecipeState, def: MicroAction) {
+  return def.kind === 'timer' && !!def.clockFrom && s.micro[def.clockFrom]?.status === 'done' && s.micro[def.id].status === 'pending';
+}
+
+/** Start the clocks of timers that begin when `sourceId` is confirmed */
+function startDependentTimers(s: RecipeState, sourceId: string, now: number): RecipeState {
+  let next = s;
+  allMicroActions.forEach((m) => {
+    if (m.kind !== 'timer' || m.clockFrom !== sourceId) return;
+    const p = next.micro[m.id];
+    if (p.status !== 'pending' || p.timer.runningSince || p.timer.accumulatedMs) return;
+    next = patchMicro(next, m.id, { timer: { ...p.timer, runningSince: s.paused ? null : now } });
+  });
+  return next;
+}
+
 function activate(s: RecipeState, stepIndex: number, microIndex: number, now: number): RecipeState {
   const def = microAt(stepIndex, microIndex);
   if (!def) return s;
   const prev = s.micro[def.id];
   const timer =
-    def.kind === 'timer' && !s.paused ? { ...prev.timer, runningSince: now } : prev.timer;
+    def.kind === 'timer' && !s.paused && !prev.timer.runningSince ? { ...prev.timer, runningSince: now } : prev.timer;
   let next: RecipeState = {
     ...s,
     active: { step: stepIndex, micro: microIndex },
@@ -256,11 +284,15 @@ function advance(s: RecipeState, now: number, status: 'done' | 'skipped', source
     inspectionOpen: false,
     earlyConfirmAt: null,
   });
+  if (status === 'done') {
+    next = { ...next, lastCompleted: { microId: def.id, at: now, label: doneLabelFor(def) } };
+    next = startDependentTimers(next, def.id, now);
+  }
   next = addLog(next, {
     t: now,
-    type: status === 'done' ? 'confirm' : 'skip',
+    type: status === 'done' ? (def.kind === 'toolReturn' ? 'tool-return' : 'confirm') : 'skip',
     microId: def.id,
-    label: status === 'done' ? def.confirmLabel : `Skipped ${def.label}`,
+    label: status === 'done' ? doneLabelFor(def) : `Skipped ${def.label}`,
     source,
   });
   const step = recipeConfig.steps[s.active.step];
@@ -324,6 +356,8 @@ export function recipeReducer(s: RecipeState, a: RecipeAction): RecipeState {
 
       switch (def.kind) {
         case 'check':
+        case 'toolReturn':
+          // toolReturn = the cook's own confirmation that the tool is resting safely (never sensor-verified)
           return advance(pushUndo(stamped), a.now, 'done', a.source);
 
         case 'counter': {
@@ -453,8 +487,13 @@ export function recipeReducer(s: RecipeState, a: RecipeAction): RecipeState {
         const target = s.viewedStep;
         const cur = activeMicro(next)!;
         next = patchMicro(next, cur.id, { ...flushMicro(next.micro[cur.id], a.now), status: 'pending' });
+        const redo = new Set(recipeConfig.steps[target].micro.map((m) => m.id));
         recipeConfig.steps[target].micro.forEach((m) => {
           next = patchMicro(next, m.id, { ...emptyProgress() });
+        });
+        // timers whose clock starts from a redone action start fresh too
+        allMicroActions.forEach((m) => {
+          if (m.kind === 'timer' && m.clockFrom && redo.has(m.clockFrom)) next = patchMicro(next, m.id, { ...emptyProgress() });
         });
         next = activate(next, target, 0, a.now);
       }
@@ -472,6 +511,7 @@ export function recipeReducer(s: RecipeState, a: RecipeAction): RecipeState {
         ...last,
         undo: s.undo.slice(0, -1),
         lastConfirmAt: a.now,
+        lastCompleted: null, // undo removes the completed state — the mark must not linger or replay
       };
       const def = activeMicro(restored);
       if (def) {
@@ -491,6 +531,10 @@ export function recipeReducer(s: RecipeState, a: RecipeAction): RecipeState {
       if (!s.paused) {
         let next: RecipeState = { ...s, paused: true, pausedAt: a.now };
         if (def) next = patchMicro(next, def.id, flushMicro(s.micro[def.id], a.now));
+        // background clocks (e.g. first side started at the pour) pause too
+        allMicroActions.forEach((m) => {
+          if (isPreStarted(next, m)) next = patchMicro(next, m.id, flushMicro(next.micro[m.id], a.now));
+        });
         return addLog(next, { t: a.now, type: 'pause', label: 'Paused' });
       }
       let next: RecipeState = {
@@ -503,6 +547,9 @@ export function recipeReducer(s: RecipeState, a: RecipeAction): RecipeState {
         const p = s.micro[def.id];
         next = patchMicro(next, def.id, { timer: { ...p.timer, runningSince: a.now } });
       }
+      allMicroActions.forEach((m) => {
+        if (isPreStarted(next, m)) next = patchMicro(next, m.id, { timer: { ...next.micro[m.id].timer, runningSince: a.now } });
+      });
       return addLog(next, { t: a.now, type: 'resume', label: 'Resumed' });
     }
 

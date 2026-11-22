@@ -1,11 +1,12 @@
-import { Bowl, BatterPool, Burner, HeatLines, OilBottle, Pan, Pancake, Annotation } from '../objects';
+import { Bowl, BatterPool, Burner, HeatLines, OilBottle, Pan, Pancake, Annotation, RestSpot } from '../objects';
 import { CheckMark, SceneFrame, palette, useMotionPhase, wobblyEllipse } from '../sketch';
-import { isDone, type SceneProps } from './types';
+import { isDone, restLabelOf, type SceneProps } from './types';
 
-/** Heat on → preheat (rising heat lines) → oil → pour (bowl tilts, batter spreads). */
-export function PanScene({ microIndex, microStates, live, elapsedSec, stepDone, reduced }: SceneProps) {
+/** Heat on → preheat (rising heat lines) → oil → pour (bowl tilts, batter spreads) → bowl moved away from the heat. */
+export function PanScene({ step, microIndex, microStates, live, elapsedSec, stepDone, reduced }: SceneProps) {
   const { energy } = useMotionPhase(live.active, live.intensity, { speed: 4, reduced });
-  const [heatOn, preheat, oil, pour] = microStates;
+  const [heatOn, preheat, oil, pour, clear] = microStates;
+  const cleared = isDone(clear);
   const burnerOn = isDone(heatOn);
   const warm = isDone(preheat) ? 1 : microIndex === 1 ? Math.min(1, elapsedSec / 45) : 0;
   const oiled = isDone(oil);
@@ -46,6 +47,17 @@ export function PanScene({ microIndex, microStates, live, elapsedSec, stepDone, 
           {energy > 0.08 && (
             <path d="M408,150 C392,180 372,214 344,262" fill="none" stroke={palette.egg} strokeWidth={4 + energy * 6} strokeLinecap="round" opacity={0.9} filter="url(#rim-crayon)" />
           )}
+        </g>
+      )}
+      {microIndex === 4 && (
+        <g>
+          <RestSpot x={560} y={394} rx={70} ry={13} label={restLabelOf(step)} settled={cleared} seed={13} />
+          <g className={cleared || reduced ? '' : 'bob'}>
+            <g transform={cleared ? 'translate(560,350)' : 'translate(540,168) rotate(-6)'}>
+              <Bowl rx={62} depth={46} contents={<BatterPool rx={40} ry={8} level={0.15} />} />
+            </g>
+          </g>
+          {!cleared && <path d="M604,200 C618,236 616,276 602,312 M602,312 l-1,-11 M602,312 l8,-7" fill="none" stroke={palette.terracotta} strokeWidth={1.8} strokeLinecap="round" opacity={0.8} />}
         </g>
       )}
       {stepDone && <CheckMark x={560} y={110} size={1.4} />}

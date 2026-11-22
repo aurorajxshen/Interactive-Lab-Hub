@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
 import type { Inspection } from '../config/recipeConfig';
 
-export function InspectionPrompt({ inspection, elapsedSec, targetSec, onChoose, onClose }: { inspection: Inspection; elapsedSec: number; targetSec: number; onChoose: (id: string) => void; onClose: () => void }) {
+export function InspectionPrompt({ inspection, elapsedSec, targetSec, reduced, onChoose, onClose }: { inspection: Inspection; elapsedSec: number; targetSec: number; reduced?: boolean; onChoose: (id: string) => void; onClose: () => void }) {
   return (
-    <motion.div className="inspection" role="dialog" aria-label="Batter check" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+    <motion.div className="inspection" role="dialog" aria-label="Batter check" initial={{ opacity: 0, y: reduced ? 0 : 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduced ? 0 : 0.4 }}>
       <p className="inspection-kicker">
         {Math.floor(elapsedSec)} s active of ≈ {Math.round(targetSec)} s reference
       </p>

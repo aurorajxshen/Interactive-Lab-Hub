@@ -386,6 +386,28 @@ export function Plate({ children, ...p }: Place & { children?: ReactNode }) {
   );
 }
 
+/* ───────── tool rest spot (tool-return checkpoints) ───────── */
+
+/**
+ * A pencilled "home" for a tool: a dashed outline while waiting, a soft
+ * crayon fill once the cook confirms the tool is resting there. Purely
+ * illustrative — it shows the cook's confirmation, it does not detect anything.
+ */
+export function RestSpot({ x = 0, y = 0, rx = 90, ry = 18, label, settled = false, seed = 3 }: { x?: number; y?: number; rx?: number; ry?: number; label?: string; settled?: boolean; seed?: number }) {
+  const d = useMemo(() => wobblyEllipse(0, 0, rx, ry, seed, 0.03, settled ? 0.06 : 0), [rx, ry, seed, settled]);
+  return (
+    <g transform={`translate(${x},${y})`} className="rest-spot">
+      {settled && <Crayon d={d} color={palette.green} opacity={0.22} dx={2} dy={2} />}
+      <path d={d} fill="none" stroke={settled ? palette.green : palette.ink} strokeWidth={1.6} strokeDasharray={settled ? undefined : '6 7'} strokeLinecap="round" opacity={settled ? 0.85 : 0.45} filter="url(#rim-rough)" />
+      {label && (
+        <text y={ry + 22} textAnchor="middle" className="svg-hand" fontSize={18} fill={settled ? palette.ink : palette.terracotta}>
+          {label}
+        </text>
+      )}
+    </g>
+  );
+}
+
 /* ───────── small helpers ───────── */
 
 export function Steam({ x = 0, y = 0, n = 3 }: { x?: number; y?: number; n?: number }) {
