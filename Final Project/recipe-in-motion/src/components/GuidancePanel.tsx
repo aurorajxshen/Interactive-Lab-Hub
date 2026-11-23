@@ -11,6 +11,8 @@ interface Props {
   toolReturn?: boolean;
   speech: string;
   speechKey: string;
+  /** Pre-recorded clip key (falls back to the browser voice) */
+  clip?: string;
   voice: VoiceGuidance;
   voiceDisabled?: boolean;
   tone?: 'default' | 'muted';
@@ -20,7 +22,7 @@ interface Props {
  * The one place micro-action copy is rendered: instruction, tip, note,
  * safety cue, visual cues and the voice play/stop control.
  */
-export function GuidancePanel({ kicker, guidance, cues, toolReturn, speech, speechKey, voice, voiceDisabled, tone = 'default' }: Props) {
+export function GuidancePanel({ kicker, guidance, cues, toolReturn, speech, speechKey, clip, voice, voiceDisabled, tone = 'default' }: Props) {
   const playing = voice.speakingKey === speechKey;
   return (
     <section className={`guidance-panel is-${tone}`} aria-labelledby="guidance-instruction">
@@ -30,7 +32,7 @@ export function GuidancePanel({ kicker, guidance, cues, toolReturn, speech, spee
           <button
             type="button"
             className={`voice-btn ${playing ? 'is-on' : ''}`}
-            onClick={() => voice.toggle(speech, speechKey)}
+            onClick={() => voice.toggle(speech, speechKey, clip)}
             disabled={voiceDisabled}
             aria-pressed={playing}
             aria-label={playing ? 'Stop reading aloud (V)' : 'Read this aloud (V)'}

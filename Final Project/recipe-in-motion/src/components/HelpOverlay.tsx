@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { keyboardMap } from '../config/interactionConfig';
-import type { VoiceGuidance } from '../voice/useVoiceGuidance';
+import { RECORDED_VOICE, type VoiceGuidance } from '../voice/useVoiceGuidance';
+import { clipKeys, voiceSample } from '../voice/voiceLines';
 import type { SensorBridge } from '../sensors/useSensorBridge';
 
 const keyName = (k: string) => (k === ' ' ? 'Space' : k === 'ArrowLeft' ? '←' : k === 'ArrowRight' ? '→' : k.length === 1 ? k.toUpperCase() : k);
@@ -70,8 +71,13 @@ export function HelpOverlay({ onClose, voice, sensors }: { onClose: () => void; 
               <div className="voice-settings">
                 <label>
                   <span>Voice</span>
-                  <select value={voice.voice?.voiceURI ?? ''} onChange={(e) => voice.setVoiceURI(e.target.value || null)} disabled={voice.voices.length === 0}>
-                    {voice.voices.length === 0 && <option value="">Browser default</option>}
+                  <select
+                    value={voice.recorded ? RECORDED_VOICE : (voice.voice?.voiceURI ?? '')}
+                    onChange={(e) => voice.setVoiceURI(e.target.value || null)}
+                    disabled={voice.voices.length === 0 && !voice.hasRecordings}
+                  >
+                    {voice.hasRecordings && <option value={RECORDED_VOICE}>Recorded voice (natural)</option>}
+                    {voice.voices.length === 0 && !voice.hasRecordings && <option value="">Browser default</option>}
                     {voice.voices.map((v) => (
                       <option key={v.voiceURI} value={v.voiceURI}>
                         {v.name} ({v.lang})
@@ -83,10 +89,15 @@ export function HelpOverlay({ onClose, voice, sensors }: { onClose: () => void; 
                   <input type="checkbox" checked={voice.autoRead} onChange={(e) => voice.setAutoRead(e.target.checked)} />
                   <span>Read each new action aloud</span>
                 </label>
-                <button className="text-btn" onClick={() => voice.speak('This is how instructions will sound.', 'help-sample')}>
+                <button className="text-btn" onClick={() => voice.speak(voiceSample, 'help-sample', { clip: clipKeys.sample })}>
                   Hear a sample
                 </button>
-                <p className="muted">Uses your browser’s built-in voices — free and offline-friendly. Never plays when the page first loads.</p>
+                {voice.recorded && (
+                  <p className="muted">
+                    {voice.recorded.credit} ({voice.recorded.name}). Lines without a recording use the browser voice.
+                  </p>
+                )}
+                <p className="muted">Browser voices are free and work offline. Each new action is read aloud once you start cooking; never on page load.</p>
               </div>
             ) : (
               <p className="muted">This browser has no speech voices. All guidance is on screen.</p>

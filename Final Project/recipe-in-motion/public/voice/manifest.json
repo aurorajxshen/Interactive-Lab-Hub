@@ -1,0 +1,142 @@
+{
+  "provider": "elevenlabs",
+  "voiceName": "Sarah - Mature, Reassuring, Confident",
+  "voiceId": "EXAVITQu4vr4xnSDxMaL",
+  "modelId": "eleven_multilingual_v2",
+  "generatedAt": "2026-11-23T00:15:56.695Z",
+  "credit": "Voice generated with ElevenLabs",
+  "clips": {
+    "step-chop": {
+      "file": "step-chop-795d3faaa4.mp3",
+      "text": "Chop the scallion. Thin green rings, about 2–3 mm wide."
+    },
+    "step-batter": {
+      "file": "step-batter-2e2e9ff5a1.mp3",
+      "text": "Egg, water & flour. Three things into one bowl, one at a time."
+    },
+    "step-season": {
+      "file": "step-season-7d3ab5c37a.mp3",
+      "text": "Salt & pepper. A few twists of the grinder over the bowl."
+    },
+    "step-whisk": {
+      "file": "step-whisk-9f3f8e69a3.mp3",
+      "text": "Whisk until smooth. About thirty seconds of steady whisking."
+    },
+    "step-scallions": {
+      "file": "step-scallions-dac3a1b092.mp3",
+      "text": "Fold in the scallion. Green rings into the batter, a quick stir."
+    },
+    "step-pan": {
+      "file": "step-pan-b09183e1c9.mp3",
+      "text": "Heat, oil & pour. A gentle heat and a thin film of oil."
+    },
+    "step-first-side": {
+      "file": "step-first-side-8db0aa2b12.mp3",
+      "text": "Cook, then flip. Wait for set edges, then turn it over."
+    },
+    "step-second-side": {
+      "file": "step-second-side-eb63a2e7a9.mp3",
+      "text": "Finish & plate. A short second side, heat off, onto the plate."
+    },
+    "micro-chop-scallion": {
+      "file": "micro-chop-scallion-e3fdff272a.mp3",
+      "text": "Chop half a scallion into thin rings, two to three millimetres wide. Keep your fingertips curled under."
+    },
+    "micro-knife-down": {
+      "file": "micro-knife-down-d9ee8d9f58.mp3",
+      "text": "Put the knife down flat on the board, with the blade facing away from you."
+    },
+    "micro-add-egg": {
+      "file": "micro-add-egg-dd51ebe12d.mp3",
+      "text": "Crack one egg into the bowl. Crack it on the flat counter, not the bowl rim — fewer shell pieces."
+    },
+    "micro-add-water": {
+      "file": "micro-add-water-998ed7deb1.mp3",
+      "text": "Pour in forty-five millilitres of water. That is three tablespoons."
+    },
+    "micro-add-flour": {
+      "file": "micro-add-flour-8946abd78a.mp3",
+      "text": "Add three level scoops of flour with the fifteen millilitre spoon. Level, not heaped. Nod when all three are in."
+    },
+    "micro-spoon-return": {
+      "file": "micro-spoon-return-d1afa2e6b0.mp3",
+      "text": "Put the measuring spoon back on its rest."
+    },
+    "micro-add-salt": {
+      "file": "micro-add-salt-266042467a.mp3",
+      "text": "Twist the salt grinder twice over the bowl. Nod when you are done."
+    },
+    "micro-add-pepper": {
+      "file": "micro-add-pepper-1f1c9cd600.mp3",
+      "text": "Optional: twist the pepper grinder twice over the bowl, or skip it. Nod when you are done."
+    },
+    "micro-grinders-return": {
+      "file": "micro-grinders-return-ae5a111d8b.mp3",
+      "text": "Stand both grinders upright together, away from the bowl."
+    },
+    "micro-whisk-batter": {
+      "file": "micro-whisk-batter-3f47830dd6.mp3",
+      "text": "Whisk steadily for about thirty seconds, until there is no dry flour."
+    },
+    "inspect-whisk-batter": {
+      "file": "inspect-whisk-batter-08176a3b57.mp3",
+      "text": "Lift the whisk and look. How is the batter?"
+    },
+    "micro-add-scallions": {
+      "file": "micro-add-scallions-042656dada.mp3",
+      "text": "Tip all the chopped scallion into the batter. Keep using the same whisk — no need to put it down yet."
+    },
+    "micro-stir-scallions": {
+      "file": "micro-stir-scallions-1860aabe53.mp3",
+      "text": "Stir gently for five to ten seconds, just until the green is spread through."
+    },
+    "micro-whisk-return": {
+      "file": "micro-whisk-return-f9641020a8.mp3",
+      "text": "Set the whisk down on a plate or spoon rest."
+    },
+    "micro-heat-on": {
+      "file": "micro-heat-on-7661aa6644.mp3",
+      "text": "Set the pan on the burner and turn it to medium-low. Turn the pan handle inward, away from the counter edge."
+    },
+    "micro-preheat": {
+      "file": "micro-preheat-f966f55cee.mp3",
+      "text": "Let the pan warm for about forty-five to sixty seconds."
+    },
+    "micro-add-oil": {
+      "file": "micro-add-oil-79820c3df1.mp3",
+      "text": "Add half a teaspoon of oil and tilt the pan to coat."
+    },
+    "micro-pour-batter": {
+      "file": "micro-pour-batter-e5011bf5c3.mp3",
+      "text": "Pour in all of the batter and let it spread into a round. Hot pan — keep the handle turned inward."
+    },
+    "micro-clear-area": {
+      "file": "micro-clear-area-ffe2e298a8.mp3",
+      "text": "Move the bowl and scraper away from the burner, and clear the space beside the pan."
+    },
+    "micro-cook-first": {
+      "file": "micro-cook-first-0c7a5b7e99.mp3",
+      "text": "Cook undisturbed for about ninety seconds to two minutes, then check the edges."
+    },
+    "micro-flip": {
+      "file": "micro-flip-496bca5253.mp3",
+      "text": "Slide the spatula under and turn the pancake over in one motion. Hot pan — keep the handle turned inward."
+    },
+    "micro-cook-second": {
+      "file": "micro-cook-second-9fbe27a9d3.mp3",
+      "text": "Cook the second side for about forty-five to sixty seconds, then check it."
+    },
+    "micro-heat-off-tools": {
+      "file": "micro-heat-off-tools-2b32437368.mp3",
+      "text": "Turn the burner off, then rest the spatula away from the hot pan."
+    },
+    "micro-plate": {
+      "file": "micro-plate-4127766c36.mp3",
+      "text": "Tilt the pan and slide the pancake onto the plate. Hold the pan by its handle — it is still hot."
+    },
+    "sample": {
+      "file": "sample-50fe6e20a5.mp3",
+      "text": "This is how instructions will sound."
+    }
+  }
+}

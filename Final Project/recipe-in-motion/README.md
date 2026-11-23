@@ -12,6 +12,19 @@ npm run dev        # http://localhost:5173
 npm run build      # type-check + production build
 ```
 
+## Natural voice (pre-recorded with ElevenLabs)
+
+Every spoken line (33 lines, ~2,400 characters) can be recorded once and shipped as MP3s in `public/voice/`. The app plays a recording when one exists for the exact current text, and otherwise uses the browser voice. Each new action is read aloud automatically once cooking starts.
+
+1. Create a free account at elevenlabs.io → **Developers / API Keys** → create a key. Give it only **Text to Speech** and **Voices (read)** permission, and optionally a credit limit (~3,000).
+2. In this folder create `.env.local` containing one line: `ELEVENLABS_API_KEY=your-key`. It is git-ignored; never commit it or paste it anywhere else.
+3. `npm run voice:dry` shows every line and the character count (no key, no credits).
+4. `npm run voice:voices` lists voices; pick a warm, clear one.
+5. `npm run voice:generate -- --voice "Sarah"` records the clips (re-runs only record lines whose text changed).
+6. Reload the site. Help → Voice shows **Recorded voice (natural)**. Commit `public/voice/` (MP3s + `manifest.json`), not `.env.local`.
+
+Free-plan clips are for non-commercial use and need attribution; the app shows “Voice generated with ElevenLabs” in Help.
+
 ## Keyboard
 
 | Key | Action |

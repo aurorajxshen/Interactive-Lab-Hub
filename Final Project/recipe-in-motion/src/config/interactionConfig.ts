@@ -24,9 +24,16 @@ export const interactionConfig = {
 
 /**
  * Voice guidance (browser Web Speech API — free, local, no API key).
- * Voice never autoplays on load; the cook presses Play (or opts in to auto-read).
+ * Each new action is read aloud automatically once cooking has started (the
+ * "Let's cook" press is the user gesture browsers require). Nothing speaks on
+ * page load. Auto-read can be turned off in Help; Listen / V always works.
  */
 export const voiceConfig = {
+  /** Read each new action aloud when the recipe moves on */
+  autoReadDefault: true,
+  /** Small pause after a step changes so speech follows the completion tick, and so
+   *  Chrome doesn't drop an utterance queued right after cancel() */
+  autoReadDelayMs: 350,
   rate: 0.97,
   pitch: 1.02,
   volume: 1,
@@ -51,7 +58,7 @@ export const voiceConfig = {
   ],
   /** Novelty / low-quality macOS voices that should never be auto-picked */
   avoidNames: ['Albert', 'Bad News', 'Bahh', 'Bells', 'Boing', 'Bubbles', 'Cellos', 'Good News', 'Jester', 'Organ', 'Superstar', 'Trinoids', 'Whisper', 'Wobble', 'Zarvox', 'Deranged', 'Hysterical', 'Pipe Organ', 'Junior', 'Ralph', 'Fred', 'Kathy', 'Princess', 'Grandma', 'Grandpa', 'Eddy', 'Flo', 'Reed', 'Rocko', 'Sandy', 'Shelley'],
-  storageKey: 'recipe-in-motion.voice.v1',
+  storageKey: 'recipe-in-motion.voice.v2',
 };
 
 /** Keyboard map. Change keys here; the help overlay reads from this list. */

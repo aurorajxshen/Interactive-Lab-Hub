@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc -b"
+    "typecheck": "tsc -b",
+    "voice:dry": "node scripts/generate-voice.mjs --dry-run",
+    "voice:voices": "node --env-file-if-exists=.env.local scripts/generate-voice.mjs --list-voices",
+    "voice:generate": "node --env-file-if-exists=.env.local scripts/generate-voice.mjs"
   },
   "dependencies": {
     "framer-motion": "^11.11.17",

@@ -1,11 +1,12 @@
-import { useEffect, useRef, type CSSProperties } from 'react';
+import { useEffect, type CSSProperties } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { accentColors, helperFor, recipeConfig, speechFor, stateHelpers, stepOfMicro } from '../config/recipeConfig';
-import { interactionConfig } from '../config/interactionConfig';
+import { interactionConfig, voiceConfig } from '../config/interactionConfig';
 import { sceneRegistry } from '../illustrations/scenes';
 import { motionElapsedMs, timerElapsedMs, isViewingActive, isRecipeComplete } from '../state/recipeState';
 import type { CookingSession } from '../state/useCookingSession';
 import type { VoiceGuidance } from '../voice/useVoiceGuidance';
+import { clipKeys, stepSpeech } from '../voice/voiceLines';
 import type { SensorStatus } from '../sensors/useSensorBridge';
 import { Header } from '../components/Header';
 import { MotionFeedback } from '../components/MotionFeedback';
@@ -66,7 +67,8 @@ export function CookingScreen({ session, now, reduced, onToggleReduced, onHelp, 
     : stepDone
       ? 'Step complete'
       : `Action ${microIndex + 1} of ${step.micro.length} · ${micro.label}${micro.optional ? ' (optional)' : ''}`;
-  const speech = showActive ? speechFor(micro) : `${step.title}. ${step.intro}`;
+  const speech = showActive ? speechFor(micro) : stepSpeech(viewing);
+  const clip = showActive ? clipKeys.micro(micro.id) : clipKeys.step(step.id);
   const speechKey = `${viewing}:${micro.id}:${mode}`;
 
   /* ── helper label above the confirm button ── */
@@ -83,25 +85,27 @@ export function CookingScreen({ session, now, reduced, onToggleReduced, onHelp, 
           ? stateHelpers.inspection
           : helperFor(micro);
 
-  /* ── voice: cancel on change / pause / unmount; optional auto-read never fires on first render ── */
-  const firstKey = useRef(true);
+  /* ── voice: each new action is read aloud (auto-read, on by default); cancel on change / pause / unmount.
+     This screen only mounts after the cook pressed "Let's cook", so it never speaks on page load. ── */
   const { stop, speak, autoRead } = voice;
   useEffect(() => {
     stop();
-    if (firstKey.current) {
-      firstKey.current = false;
-      return;
-    }
-    if (autoRead && mode === 'active' && !state.paused) speak(speech, speechKey);
+    if (autoRead && mode === 'active' && !state.paused) speak(speech, speechKey, { auto: true, delayMs: voiceConfig.autoReadDelayMs, clip });
     // speech text is derived from speechKey
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [speechKey]);
+  // the batter check-in asks its question aloud too
+  const inspectionQuestion = showInspection && inspection ? inspection.question : null;
+  useEffect(() => {
+    if (inspectionQuestion && autoRead && !state.paused) speak(inspectionQuestion, `${speechKey}:inspect`, { auto: true, clip: clipKeys.inspect(micro.id) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inspectionQuestion]);
   useEffect(() => {
     if (state.paused) stop();
   }, [state.paused, stop]);
   useEffect(() => () => stop(), [stop]);
   useEffect(() => {
-    voiceToggleRef.current = () => voice.toggle(speech, speechKey);
+    voiceToggleRef.current = () => voice.toggle(speech, speechKey, clip);
     return () => {
       voiceToggleRef.current = null;
     };
@@ -181,6 +185,7 @@ export function CookingScreen({ session, now, reduced, onToggleReduced, onHelp, 
             toolReturn={showActive && micro.kind === 'toolReturn'}
             speech={speech}
             speechKey={speechKey}
+            clip={clip}
             voice={voice}
             tone={showActive ? 'default' : 'muted'}
           />

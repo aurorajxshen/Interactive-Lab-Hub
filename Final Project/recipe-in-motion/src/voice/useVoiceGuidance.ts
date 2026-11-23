@@ -13,6 +13,7 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { voiceConfig } from '../config/interactionConfig';
+import type { VoiceManifest } from './voiceLines';
 
 interface VoicePrefs {
   voiceURI: string | null;
@@ -22,11 +23,11 @@ interface VoicePrefs {
 function loadPrefs(): VoicePrefs {
   try {
     const raw = localStorage.getItem(voiceConfig.storageKey);
-    if (raw) return { voiceURI: null, autoRead: false, ...(JSON.parse(raw) as Partial<VoicePrefs>) };
+    if (raw) return { voiceURI: null, autoRead: voiceConfig.autoReadDefault, ...(JSON.parse(raw) as Partial<VoicePrefs>) };
   } catch {
     /* ignore */
   }
-  return { voiceURI: null, autoRead: false };
+  return { voiceURI: null, autoRead: voiceConfig.autoReadDefault };
 }
 
 function savePrefs(p: VoicePrefs) {
@@ -56,17 +57,25 @@ export function scoreVoice(v: SpeechSynthesisVoice): number {
   return score;
 }
 
+/** Select value meaning "use the pre-recorded clips" (the default when they exist) */
+export const RECORDED_VOICE = 'recorded';
+
+type SpeakOpts = { auto?: boolean; delayMs?: number; /** key into public/voice/manifest.json */ clip?: string };
+
 export function useVoiceGuidance() {
   const s = synth();
-  const supported = !!s && typeof window !== 'undefined' && 'SpeechSynthesisUtterance' in window;
+  const synthSupported = !!s && typeof window !== 'undefined' && 'SpeechSynthesisUtterance' in window;
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [prefs, setPrefs] = useState<VoicePrefs>(loadPrefs);
   const [speakingKey, setSpeakingKey] = useState<string | null>(null);
+  const [manifest, setManifest] = useState<VoiceManifest | null>(null);
   const lastPlayRef = useRef(0);
   const uttRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const pendingRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (!supported || !s) return;
+    if (!synthSupported || !s) return;
     const update = () => setVoices(s.getVoices());
     update();
     s.addEventListener?.('voiceschanged', update);
@@ -74,7 +83,21 @@ export function useVoiceGuidance() {
       s.removeEventListener?.('voiceschanged', update);
       s.cancel();
     };
-  }, [supported, s]);
+  }, [synthSupported, s]);
+
+  // pre-recorded clips (scripts/generate-voice.mjs). Missing manifest = browser voice only.
+  useEffect(() => {
+    let alive = true;
+    fetch(`${import.meta.env.BASE_URL}voice/manifest.json`, { cache: 'no-cache' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((m: VoiceManifest | null) => {
+        if (alive && m && m.clips) setManifest(m);
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   /** English voices, best first */
   const ranked = useMemo(
@@ -87,55 +110,97 @@ export function useVoiceGuidance() {
     [voices],
   );
 
+  const useRecorded = !!manifest && (prefs.voiceURI === null || prefs.voiceURI === RECORDED_VOICE);
   const voice = useMemo(() => ranked.find((v) => v.voiceURI === prefs.voiceURI) ?? ranked[0] ?? null, [ranked, prefs.voiceURI]);
+  const supported = synthSupported || !!manifest;
 
   const stop = useCallback(() => {
-    const sy = synth();
+    if (pendingRef.current) {
+      clearTimeout(pendingRef.current);
+      pendingRef.current = null;
+    }
     if (uttRef.current) {
       uttRef.current.onend = null;
       uttRef.current.onerror = null;
       uttRef.current = null;
     }
-    sy?.cancel();
+    if (audioRef.current) {
+      const a = audioRef.current;
+      a.onended = null;
+      a.onerror = null;
+      a.pause();
+      audioRef.current = null;
+    }
+    synth()?.cancel();
     setSpeakingKey(null);
   }, []);
 
   const speak = useCallback(
-    (text: string, key: string) => {
-      const sy = synth();
-      if (!sy || !supported) return;
+    (text: string, key: string, opts: SpeakOpts = {}) => {
+      // a recording is used only if it was made from exactly this text (recipe edits fall back safely)
+      const clip = useRecorded && opts.clip ? manifest?.clips[opts.clip] : undefined;
+      const recorded = clip && clip.text === text ? clip : undefined;
+      if (!recorded && !synthSupported) return;
       const t = Date.now();
-      if (t - lastPlayRef.current < voiceConfig.replayGuardMs) return; // rapid repeat
+      // rapid repeated presses are ignored; automatic reads always replace what is playing
+      if (!opts.auto && t - lastPlayRef.current < voiceConfig.replayGuardMs) return;
       lastPlayRef.current = t;
       stop();
-      const u = new SpeechSynthesisUtterance(text);
-      u.rate = voiceConfig.rate;
-      u.pitch = voiceConfig.pitch;
-      u.volume = voiceConfig.volume;
-      if (voice) {
-        u.voice = voice;
-        u.lang = voice.lang;
-      } else u.lang = 'en-US';
-      const done = () => {
-        if (uttRef.current === u) {
-          uttRef.current = null;
-          setSpeakingKey(null);
+      setSpeakingKey(key);
+      const start = () => {
+        const finish = (owner: unknown) => () => {
+          if (audioRef.current === owner || uttRef.current === owner) {
+            audioRef.current = null;
+            uttRef.current = null;
+            setSpeakingKey(null);
+          }
+        };
+        if (recorded) {
+          const a = new Audio(`${import.meta.env.BASE_URL}voice/${recorded.file}`);
+          a.volume = voiceConfig.volume;
+          audioRef.current = a;
+          a.onended = finish(a);
+          a.onerror = () => {
+            // file missing or blocked → say it with the browser voice instead
+            if (audioRef.current !== a) return;
+            audioRef.current = null;
+            if (synthSupported) speakSynth();
+            else setSpeakingKey(null);
+          };
+          a.play().catch(() => a.onerror?.(new Event('error')));
+          return;
+        }
+        speakSynth();
+        function speakSynth() {
+          const u = new SpeechSynthesisUtterance(text);
+          u.rate = voiceConfig.rate;
+          u.pitch = voiceConfig.pitch;
+          u.volume = voiceConfig.volume;
+          if (voice) {
+            u.voice = voice;
+            u.lang = voice.lang;
+          } else u.lang = 'en-US';
+          u.onend = finish(u);
+          u.onerror = finish(u);
+          uttRef.current = u;
+          synth()!.speak(u);
         }
       };
-      u.onend = done;
-      u.onerror = done;
-      uttRef.current = u;
-      setSpeakingKey(key);
-      sy.speak(u);
+      if (opts.delayMs) {
+        pendingRef.current = setTimeout(() => {
+          pendingRef.current = null;
+          start();
+        }, opts.delayMs);
+      } else start();
     },
-    [supported, voice, stop],
+    [useRecorded, manifest, synthSupported, voice, stop],
   );
 
   /** Play/stop toggle for one piece of guidance */
   const toggle = useCallback(
-    (text: string, key: string) => {
+    (text: string, key: string, clip?: string) => {
       if (speakingKey === key) stop();
-      else speak(text, key);
+      else speak(text, key, { clip });
     },
     [speakingKey, speak, stop],
   );
@@ -160,6 +225,9 @@ export function useVoiceGuidance() {
     supported,
     voices: ranked,
     voice,
+    /** Pre-recorded voice in use (null = browser voice) */
+    recorded: useRecorded && manifest ? { name: manifest.voiceName, credit: manifest.credit, provider: manifest.provider } : null,
+    hasRecordings: !!manifest,
     speakingKey,
     speaking: speakingKey !== null,
     speak,
